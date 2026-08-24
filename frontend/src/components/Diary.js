@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, BookOpen, Trash2 } from 'lucide-react';
 import { diaryApi } from '../api';
 
-const BACKEND = 'http://localhost:8000';
+const BACKEND = 'http://localhost:8010';
 
 function ConfidenceDot({ level }) {
   return (
