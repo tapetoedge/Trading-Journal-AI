@@ -26,21 +26,20 @@ python -m venv .venv
 .venv\Scripts\activate         # Windows (source .venv/bin/activate on Mac/Linux)
 pip install -r backend/requirements.txt
 
-# 2. Seed the demo database (synthetic trades, reproducible)
-python scripts/seed_demo.py
-
-# 3. Frontend dependencies
+# 2. Frontend dependencies
 cd frontend
 npm install
 cd ..
 
-# 4. Run both (Windows; launch.bat picks up .venv automatically)
+# 3. Run both (Windows; launch.bat picks up .venv automatically)
 launch.bat
 ```
 
 `launch.bat` starts the FastAPI backend on http://localhost:8010 and the React frontend on http://localhost:3010. On Mac/Linux run them manually: `uvicorn main:app --reload --port 8000` from `backend/`, and `npm start` from `frontend/`.
 
-To try the import flow, use `scripts/sample_import.csv` on the Import page (it contains one fresh demo day).
+This is a clean install: zero accounts, zero trades. Add your first account in the app, then import your broker's CSV or use `scripts/sample_import.csv` on the Import page to see the shape of an import (one demo day, remove it after).
+
+**Want to explore with realistic data first?** Run `python scripts/seed_demo.py` before `launch.bat` to seed 12 weeks of synthetic trades across 3 demo accounts. It's the same data the screenshots use. Delete `backend/trading_journal.db` afterward to reset to a clean install.
 
 ## Environment variables
 
