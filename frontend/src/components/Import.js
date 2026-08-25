@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, Image, CheckCircle, AlertCircle, RefreshCw, BookOpen } from 'lucide-react';
-import { importApi, syncApi } from '../api';
+import { Upload, FileText, Image, CheckCircle, AlertCircle } from 'lucide-react';
+import { importApi } from '../api';
 
 function TextPreview({ file }) {
   const [text, setText] = useState('');
@@ -53,16 +53,6 @@ function DropZone({ label, accept, onFile, file, icon: Icon }) {
   );
 }
 
-function SyncRow({ label, value, status }) {
-  const color = status === 'written' ? 'var(--green)' : status === 'skipped' ? 'var(--text-faint)' : 'var(--text-muted)';
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, padding: '2px 0', color }}>
-      <span>{label}</span>
-      <span style={{ fontFamily: 'var(--font-mono)' }}>{String(value)}</span>
-    </div>
-  );
-}
-
 export default function Import({ accounts, accountId }) {
   // CSV import state
   const [csvFile, setCsvFile] = useState(null);
@@ -70,27 +60,6 @@ export default function Import({ accounts, accountId }) {
   const [importing, setImporting] = useState(false);
   const [csvResult, setCsvResult] = useState(null);
   const [csvError, setCsvError] = useState(null);
-
-  // Obsidian sync state
-  const [obsDate, setObsDate] = useState(new Date().toISOString().slice(0, 10));
-  const [obsForce, setObsForce] = useState(false);
-  const [obsSyncing, setObsSyncing] = useState(false);
-  const [obsResult, setObsResult] = useState(null);
-  const [obsError, setObsError] = useState(null);
-
-  const handleObsSync = async () => {
-    setObsSyncing(true);
-    setObsResult(null);
-    setObsError(null);
-    try {
-      const res = await syncApi.obsidian(obsDate, obsForce);
-      setObsResult(res.data);
-    } catch (e) {
-      setObsError(e.response?.data?.detail || e.message);
-    } finally {
-      setObsSyncing(false);
-    }
-  };
 
   // Diary upload state
   const [diaryFile, setDiaryFile] = useState(null);
@@ -313,107 +282,6 @@ export default function Import({ accounts, accountId }) {
             Claude AI will read your handwritten or typed notes and extract strategy, stops, R-multiples, emotional state, and more.
           </div>
         </div>
-      </div>
-
-      {/* Obsidian Sync — full width */}
-      <div className="card" style={{ marginTop: 24 }}>
-        <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <BookOpen size={18} color="var(--accent)" />
-          Sync from Obsidian Daily Note
-        </div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-          Reads stop loss, target, strategy, source, mistakes and emotion from your
-          Obsidian daily note's <code style={{ fontFamily: 'var(--font-mono)', background: 'var(--bg-primary)', padding: '1px 6px', borderRadius: 4 }}>## Trades</code> section
-          and writes them into the journal's analysis records. Matches by ticker + entry price.
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
-          <div>
-            <label style={{ display: 'block', color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Date</label>
-            <input
-              type="date"
-              value={obsDate}
-              onChange={e => setObsDate(e.target.value)}
-              style={{ width: 160 }}
-            />
-          </div>
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: 'var(--text-muted)', cursor: 'pointer', paddingBottom: 2 }}>
-            <input
-              type="checkbox"
-              checked={obsForce}
-              onChange={e => setObsForce(e.target.checked)}
-              style={{ width: 14, height: 14, accentColor: 'var(--accent)' }}
-            />
-            Overwrite existing values
-          </label>
-
-          <button
-            className="btn btn-primary"
-            onClick={handleObsSync}
-            disabled={obsSyncing}
-            style={{ paddingLeft: 20, paddingRight: 20 }}
-          >
-            {obsSyncing
-              ? <><span className="spinner" style={{ width: 15, height: 15 }} /> Syncing…</>
-              : <><RefreshCw size={14} /> Sync Note</>
-            }
-          </button>
-        </div>
-
-        {obsError && (
-          <div style={{ marginTop: 14, padding: '10px 14px', background: 'var(--red-soft)', border: '1px solid color-mix(in oklch, var(--red) 35%, transparent)', borderRadius: 8, color: 'var(--red)', fontSize: 13 }}>
-            <AlertCircle size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} />{obsError}
-          </div>
-        )}
-
-        {obsResult && (
-          <div style={{ marginTop: 16 }}>
-            {/* Summary bar */}
-            <div style={{ display: 'flex', gap: 20, marginBottom: 14, padding: '10px 14px', background: 'var(--bg-primary)', borderRadius: 8, border: '1px solid var(--border-soft)', fontSize: 13 }}>
-              <span><span style={{ color: 'var(--text-muted)' }}>Note trades:</span> <strong>{obsResult.note_trades}</strong></span>
-              <span><span style={{ color: 'var(--text-muted)' }}>DB trades:</span> <strong>{obsResult.db_trades}</strong></span>
-              <span><span style={{ color: 'var(--text-muted)' }}>Matched:</span> <strong>{obsResult.matched.length}</strong></span>
-              {obsResult.updated_count > 0
-                ? <span style={{ color: 'var(--green)', fontWeight: 600 }}><CheckCircle size={13} style={{ verticalAlign: 'middle', marginRight: 4 }} />{obsResult.updated_count} updated</span>
-                : <span style={{ color: 'var(--text-muted)' }}>Nothing to update</span>
-              }
-              {obsResult.unmatched.length > 0 && (
-                <span style={{ color: 'var(--orange)' }}>{obsResult.unmatched.length} unmatched</span>
-              )}
-            </div>
-
-            {/* Per-trade results */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
-              {obsResult.matched.map((m, i) => (
-                <div key={i} style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-soft)', borderRadius: 8, padding: '10px 12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                    <span style={{ fontWeight: 700, fontSize: 14 }}>{m.ticker}</span>
-                    <span style={{ fontSize: 11, color: m.status === 'updated' ? 'var(--green)' : 'var(--text-faint)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {m.status === 'updated' ? 'Updated' : 'No change'}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', marginBottom: 6 }}>
-                    {m.trade_group}
-                  </div>
-                  {Object.entries(m.written).map(([k, v]) => (
-                    <SyncRow key={k} label={k.replace(/_/g, ' ')} value={v} status="written" />
-                  ))}
-                  {Object.entries(m.skipped).map(([k, v]) => (
-                    <SyncRow key={k} label={k.replace(/_/g, ' ')} value={`${v} (kept)`} status="skipped" />
-                  ))}
-                </div>
-              ))}
-              {obsResult.unmatched.map((u, i) => (
-                <div key={i} style={{ background: 'var(--bg-primary)', border: '1px solid color-mix(in oklch, var(--orange) 35%, transparent)', borderRadius: 8, padding: '10px 12px' }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{u.ticker}</div>
-                  <div style={{ fontSize: 12, color: 'var(--orange)' }}>{u.reason}</div>
-                  {u.entry_price && <div style={{ fontSize: 11, color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', marginTop: 4 }}>Note entry: ${u.entry_price.toFixed(2)}</div>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

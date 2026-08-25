@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 const METRICS = [
   {
     category: 'Dashboard KPIs',
@@ -220,70 +218,6 @@ const FEATURES = [
   },
 ];
 
-const CHANGELOG = [
-  {
-    version: 'v0.5',
-    date: '2026-06-15',
-    title: 'Goals and targets',
-    changes: [
-      'Added editable performance goals to all 5 KPI cards (Trade Win %, Profit Factor, Day Win %, Avg Win/Loss, Expectancy).',
-      'Progress bar on each card shows percentage toward goal; turns green with a checkmark when goal is met.',
-      'Goals panel opens from the gear icon in the Dashboard header. Values are editable inline.',
-      'Goals persist per account in the settings table. Defaults applied on first load (Win Rate 65%, PF 1.5, Day Win 75%, Expectancy $50, Avg W/L 1.5).',
-      'Help and Changelog page added (this page).',
-    ],
-  },
-  {
-    version: 'v0.4',
-    date: '2026-06-15',
-    title: 'Dashboard analytics and AI upgrades',
-    changes: [
-      'Added Expectancy as a 7th KPI card: (Win% x Avg Win) + (Loss% x Avg Loss). The most important aggregate metric.',
-      'Time-of-Day P&L chart: 30-minute entry buckets from 9:30 to 4:00, showing your best and worst trading windows.',
-      'Day-of-Week P&L chart: Mon-Fri aggregate, revealing systematic session biases.',
-      'New Edge page with four behavioral analytics charts: R-Multiple Distribution, Emotion vs. Outcome, Mistake Frequency, and Hold Time.',
-      'Weekly AI Summary: Claude synthesizes behavioral patterns across the full week (not per-day grading). Cached after first generation.',
-      'Circuit Breaker: Orange dismissible banner fires when 3+ consecutive losing trades are detected in the current session.',
-      'Max drawdown computation added to backend KPI endpoint.',
-    ],
-  },
-  {
-    version: 'v0.3',
-    date: '2026-06-14',
-    title: 'AI coaching and Brain chatbot',
-    changes: [
-      'Daily AI coaching report in Day Review: grades execution quality, flags mistakes, suggests one improvement.',
-      'Brain chatbot: full-context AI assistant with access to all trades, P&L, and diary analysis.',
-      'Obsidian sync: push daily trade notes to the Obsidian vault for second-brain integration.',
-      'Weekly summary endpoint with behavioral pattern synthesis.',
-    ],
-  },
-  {
-    version: 'v0.2',
-    date: '2026-06-13',
-    title: 'Diary AI analysis and trade detail',
-    changes: [
-      'Diary upload and AI parsing: Claude extracts setup, entry/exit reason, emotional state, R-multiple, and mistakes from handwritten or typed notes.',
-      'Trade detail panel with execution breakdown, AI coaching tab, and manual analysis fields.',
-      'Strategy breakdown by P&L, win rate, and count (sourced from diary AI tagging).',
-      'Insight panel: AI-generated setup-level patterns across all trades.',
-    ],
-  },
-  {
-    version: 'v0.1',
-    date: '2026-06-11',
-    title: 'Core trading journal',
-    changes: [
-      'CSV import for Thinkorswim account statement exports. Auto-groups executions into round-trip trades.',
-      'Dashboard with 6 KPI cards, cumulative P&L area chart, and daily P&L bar chart.',
-      'Calendar heatmap with monthly MTD and per-day win rate.',
-      'Trade log with date and ticker filtering.',
-      'Account management (multiple accounts, per-account color coding).',
-      'Add trade manually modal.',
-    ],
-  },
-];
-
 function MetricCard({ item }) {
   return (
     <div style={{
@@ -331,80 +265,34 @@ function FeatureCard({ feature }) {
   );
 }
 
-function ChangelogEntry({ entry }) {
-  return (
-    <div style={{ display: 'flex', gap: 20, marginBottom: 28 }}>
-      <div style={{ width: 4, background: 'var(--purple)', borderRadius: 2, flexShrink: 0 }} />
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 4 }}>
-          <span style={{ fontWeight: 700, fontSize: 15 }}>{entry.title}</span>
-          <span style={{ fontSize: 12, color: 'var(--purple)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{entry.version}</span>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{entry.date}</span>
-        </div>
-        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.8 }}>
-          {entry.changes.map((c, i) => <li key={i}>{c}</li>)}
-        </ul>
-      </div>
-    </div>
-  );
-}
-
 export default function Help() {
-  const [tab, setTab] = useState('reference');
-
-  const tabStyle = (id) => ({
-    padding: '8px 18px',
-    border: 'none',
-    borderBottom: tab === id ? '2px solid var(--purple)' : '2px solid transparent',
-    background: 'none',
-    cursor: 'pointer',
-    fontWeight: tab === id ? 700 : 400,
-    color: tab === id ? 'var(--text)' : 'var(--text-muted)',
-    fontSize: 14,
-    marginBottom: -1,
-  });
-
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>Help and Reference</h2>
       </div>
 
-      {/* Tabs */}
-      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 24, display: 'flex', gap: 4 }}>
-        <button style={tabStyle('reference')} onClick={() => setTab('reference')}>Metrics and Features</button>
-        <button style={tabStyle('changelog')} onClick={() => setTab('changelog')}>Changelog</button>
-      </div>
-
-      {tab === 'reference' && (
-        <div>
-          {METRICS.map(section => (
-            <div key={section.category} style={{ marginBottom: 32 }}>
-              <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>
-                {section.category}
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
-                {section.items.map(item => <MetricCard key={item.name} item={item} />)}
-              </div>
-            </div>
-          ))}
-
-          <div style={{ marginBottom: 32 }}>
+      <div>
+        {METRICS.map(section => (
+          <div key={section.category} style={{ marginBottom: 32 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>
-              Features
+              {section.category}
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
-              {FEATURES.map(f => <FeatureCard key={f.name} feature={f} />)}
+              {section.items.map(item => <MetricCard key={item.name} item={item} />)}
             </div>
           </div>
-        </div>
-      )}
+        ))}
 
-      {tab === 'changelog' && (
-        <div style={{ maxWidth: 700 }}>
-          {CHANGELOG.map(entry => <ChangelogEntry key={entry.version} entry={entry} />)}
+        <div style={{ marginBottom: 32 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>
+            Features
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+            {FEATURES.map(f => <FeatureCard key={f.name} feature={f} />)}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

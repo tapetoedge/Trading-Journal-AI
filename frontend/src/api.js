@@ -68,11 +68,6 @@ export const dailySummaryApi = {
   get: (params) => api.get('/api/daily-summary', { params }),
 };
 
-export const syncApi = {
-  obsidian: (date, force = false) =>
-    api.post('/api/sync/obsidian', null, { params: { date, force } }),
-};
-
 export const goalsApi = {
   get: (params) => api.get('/api/goals', { params }),
   put: (data) => api.put('/api/goals', data),

@@ -41,7 +41,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="TradeJournal Demo API", lifespan=lifespan)
+app = FastAPI(title="Trading Journal AI API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -1935,22 +1935,6 @@ def get_weekly_summary(
         except Exception:
             pass
 
-    return result
-
-
-# ── Obsidian sync ──────────────────────────────────────────────────────────────
-
-@app.post("/api/sync/obsidian")
-def sync_obsidian(
-    date: str = Query(default=None),
-    force: bool = Query(default=False),
-):
-    from sync_obs_trades import run_sync
-    from datetime import date as _date
-    trade_date = date or str(_date.today())
-    result = run_sync(trade_date, force=force)
-    if "error" in result:
-        raise HTTPException(status_code=404, detail=result["error"])
     return result
 
 

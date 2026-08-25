@@ -84,7 +84,7 @@ export default function Sidebar({ page, onNavigate, accounts, selectedAccountId,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 14, fontWeight: 700, color: 'white'
           }}>T</div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)', fontFamily: 'var(--font-body)' }}>TradeJournal Demo</span>
+          <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)', fontFamily: 'var(--font-body)' }}>Trading Journal AI</span>
         </div>
       </div>
 

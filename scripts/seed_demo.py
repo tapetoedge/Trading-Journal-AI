@@ -1,4 +1,4 @@
-"""Seed the TradeJournal Demo database with realistic synthetic data.
+"""Seed the Trading Journal AI database with realistic synthetic data.
 
 Creates backend/trading_journal.db through the app's own schema (database.py),
 so the seed can never drift from what the app expects. Everything is generated
