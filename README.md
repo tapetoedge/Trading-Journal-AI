@@ -43,7 +43,13 @@ This is a clean install: zero accounts, zero trades. Add your first account in t
 
 ## Environment variables
 
-Copy `.env.example` to `backend/.env`. Everything is optional; the app runs without any keys and tells you exactly which feature each missing key disables.
+Copy `.env.example` to `backend/.env` and fill in the keys yourself, or ask Claude Code to do it:
+
+**Add your API keys:**
+
+> Copy backend/.env.example to backend/.env. Then ask me for my Anthropic API key, and after that my Alpaca key ID and secret key, one at a time. Write each one into the matching line in backend/.env exactly as I paste it. Do not print any of them back to me or log them anywhere else. When all three are in, tell me to restart launch.bat.
+
+Everything is optional; the app runs without any keys and tells you exactly which feature each missing key disables.
 
 | Variable | Enables |
 |---|---|
