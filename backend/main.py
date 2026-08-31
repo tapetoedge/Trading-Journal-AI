@@ -1173,6 +1173,10 @@ def delete_diary_entry(entry_id: int, conn: sqlite3.Connection = Depends(get_con
 
 ALPACA_KEY = os.getenv("APCA_API_KEY_ID", "")
 ALPACA_SECRET = os.getenv("APCA_API_SECRET_KEY", "")
+# "iex" works on a free Alpaca account; "sip" needs a paid market-data subscription.
+# Default to iex so the chart works out of the box, regardless of which tier the
+# viewer's key is on. Override with ALPACA_DATA_FEED=sip if you have the subscription.
+ALPACA_DATA_FEED = os.getenv("ALPACA_DATA_FEED", "iex")
 
 FUTURES_CHART_MAP = {
     '/ES': 'SPY', '/MES': 'SPY',
@@ -1251,7 +1255,7 @@ async def get_chart(
             "start": start.isoformat(),
             "end": end.isoformat(),
             "limit": 1000,
-            "feed": "sip",
+            "feed": ALPACA_DATA_FEED,
             "adjustment": "raw",
         }
     else:
@@ -1265,7 +1269,7 @@ async def get_chart(
             "start": f"{start_day.isoformat()}T09:30:00-04:00",
             "end": f"{date}T16:00:00-04:00",
             "limit": 1000,
-            "feed": "sip",
+            "feed": ALPACA_DATA_FEED,
             "adjustment": "raw",
         }
     headers = {
@@ -1275,7 +1279,17 @@ async def get_chart(
 
     try:
         async with httpx.AsyncClient(timeout=20.0) as client:
-            raw_bars = await _fetch_alpaca_bars(client, url, params, headers)
+            try:
+                raw_bars = await _fetch_alpaca_bars(client, url, params, headers)
+            except httpx.HTTPStatusError as e:
+                # A 403 on a non-iex feed means the key's tier doesn't carry that
+                # feed's subscription. Retry once on iex, which every Alpaca
+                # account (free included) can read, instead of failing the chart.
+                if e.response.status_code == 403 and params["feed"] != "iex":
+                    fallback_params = dict(params, feed="iex")
+                    raw_bars = await _fetch_alpaca_bars(client, url, fallback_params, headers)
+                else:
+                    raise
 
         bars = []
         for bar in raw_bars:
@@ -1292,9 +1306,10 @@ async def get_chart(
         return {"ticker": alpaca_ticker, "original_ticker": ticker, "date": date, "bars": bars}
 
     except httpx.HTTPStatusError as e:
+        detail = "subscription required for this feed" if e.response.status_code == 403 else str(e.response.status_code)
         return {
             "ticker": ticker, "date": date, "bars": [],
-            "warning": f"Alpaca API error: {e.response.status_code}"
+            "warning": f"Alpaca API error: {detail}"
         }
     except Exception as e:
         return {

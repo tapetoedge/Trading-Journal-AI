@@ -49,6 +49,7 @@ Copy `.env.example` to `backend/.env`. Everything is optional; the app runs with
 |---|---|
 | `ANTHROPIC_API_KEY` | Diary analysis, Day Review, Weekly Summary, Insights, and the Brain chat |
 | `APCA_API_KEY_ID` / `APCA_API_SECRET_KEY` | Intraday price charts on each trade (free Alpaca account works) |
+| `ALPACA_DATA_FEED` | Optional, defaults to `iex` (free-tier data). Set to `sip` only if your key has a paid market-data subscription. |
 
 ## Make it yours with Claude Code
 
