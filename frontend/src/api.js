@@ -47,8 +47,8 @@ export const diaryApi = {
 };
 
 export const chartApi = {
-  get: (ticker, date, timeframe = '1Min') =>
-    api.get(`/api/chart/${encodeURIComponent(ticker)}/${date}`, { params: { timeframe } }),
+  get: (ticker, date, timeframe = '1Min', daysBack = 1) =>
+    api.get(`/api/chart/${encodeURIComponent(ticker)}/${date}`, { params: { timeframe, days_back: daysBack } }),
 };
 
 export const insightsApi = {

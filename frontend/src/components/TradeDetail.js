@@ -997,13 +997,9 @@ export default function TradeDetail({ trade: initialTrade, tradeNavList = [], on
         {/* Right: chart + detail sections */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="card">
-            <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 12 }}>
-              {trade.ticker} · 5-Min Chart · {trade.date}
-            </div>
             <TradingChart
               ticker={trade.ticker}
               date={trade.date}
-              timeframe="5Min"
               executions={parseExecs(trade)}
               side={trade.side}
               analysis={analysis}

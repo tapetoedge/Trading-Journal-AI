@@ -4,6 +4,7 @@ import {
   BookOpen, Plus, ChevronDown, Circle, CalendarDays, Check, X, Pencil, CalendarCheck, HelpCircle
 } from 'lucide-react';
 import { accountsApi } from '../api';
+import aiJournalLogo from '../assets/ai-journal-logo.png';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -75,17 +76,15 @@ export default function Sidebar({ page, onNavigate, accounts, selectedAccountId,
       top: 0,
     }}>
       {/* Logo */}
-      <div style={{ padding: '20px 16px 12px', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 28, height: 28,
-            background: 'var(--purple)',
-            borderRadius: 8,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 14, fontWeight: 700, color: 'white'
-          }}>T</div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)', fontFamily: 'var(--font-body)' }}>Trading Journal AI</span>
-        </div>
+      <div style={{
+        padding: '18px 16px', borderBottom: '1px solid var(--border)',
+        display: 'flex', justifyContent: 'center',
+      }}>
+        <img
+          src={aiJournalLogo}
+          alt="AI Journal"
+          style={{ height: 76, width: 'auto', display: 'block' }}
+        />
       </div>
 
       {/* Account selector */}

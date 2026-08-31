@@ -3,7 +3,7 @@ import json
 import sqlite3
 import aiofiles
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends, Query
@@ -790,7 +790,7 @@ def add_trade_tag(trade_group: str, data: TagCreate, conn: sqlite3.Connection = 
     if not trade:
         raise HTTPException(status_code=404, detail="Trade not found")
     cursor = conn.execute(
-        "INSERT INTO trade_tags (trade_group, tag_type, tag_value) VALUES (?,?,?)",
+        "INSERT INTO trade_tags (trade_group, tag_type, tag_value, source) VALUES (?,?,?,'manual')",
         (trade_group, data.tag_type, data.tag_value)
     )
     conn.commit()
@@ -1182,8 +1182,43 @@ FUTURES_CHART_MAP = {
 }
 
 
+ALLOWED_CHART_TIMEFRAMES = {
+    "1Min", "3Min", "5Min", "10Min", "15Min", "30Min", "1Hour", "1Day", "1Week",
+}
+# Daily/Weekly are a wide-context view around the trade, not the single RTH session
+# the intraday timeframes use, so they get their own start/end/limit below.
+_WIDE_RANGE_TIMEFRAMES = {"1Day", "1Week"}
+
+
+async def _fetch_alpaca_bars(client, url, base_params, headers, max_bars=5000):
+    """Follow Alpaca's next_page_token until exhausted or max_bars is hit.
+
+    A single page caps at 1000 bars — a multi-day intraday request (the chart's
+    zoom-out lazy-load) can easily exceed that, and Alpaca returns bars oldest
+    first, so an unpaginated request would silently drop the most recent bars.
+    """
+    bars = []
+    page_token = None
+    while True:
+        params = dict(base_params)
+        if page_token:
+            params["page_token"] = page_token
+        resp = await client.get(url, params=params, headers=headers)
+        resp.raise_for_status()
+        data = resp.json()
+        bars.extend(data.get("bars", []))
+        page_token = data.get("next_page_token")
+        if not page_token or len(bars) >= max_bars:
+            break
+    return bars
+
+
 @app.get("/api/chart/{ticker}/{date}")
-async def get_chart(ticker: str, date: str, timeframe: str = Query("1Min")):
+async def get_chart(
+    ticker: str, date: str,
+    timeframe: str = Query("5Min"),
+    days_back: int = Query(1, ge=1),
+):
     if not ALPACA_KEY or ALPACA_KEY == "your_alpaca_api_key_here":
         return {
             "ticker": ticker, "date": date, "bars": [],
@@ -1197,32 +1232,53 @@ async def get_chart(ticker: str, date: str, timeframe: str = Query("1Min")):
     else:
         alpaca_ticker = ticker.upper()
 
-    allowed_timeframes = {"1Min", "5Min", "15Min", "1Hour"}
-    tf = timeframe if timeframe in allowed_timeframes else "1Min"
-    bar_limit = 100 if tf != "1Min" else 400
+    tf = timeframe if timeframe in ALLOWED_CHART_TIMEFRAMES else "5Min"
+
+    # Same knob as the intraday branch below (days_back widens the window when
+    # the chart is zoomed out past what's loaded) — daily/weekly just start
+    # from a much bigger default and cap much further out, since a decade of
+    # daily bars is still only ~2500 rows.
+    _WIDE_DAYS_BACK_CAP = {"1Day": 3650, "1Week": 5475}
+    days_back = min(days_back, _WIDE_DAYS_BACK_CAP.get(tf, days_back)) if tf in _WIDE_RANGE_TIMEFRAMES else min(days_back, 90)
 
     url = f"https://data.alpaca.markets/v2/stocks/{alpaca_ticker}/bars"
-    params = {
-        "timeframe": tf,
-        "start": f"{date}T09:30:00-04:00",
-        "end": f"{date}T16:00:00-04:00",
-        "limit": bar_limit,
-        "feed": "sip",
-        "adjustment": "raw",
-    }
+    if tf in _WIDE_RANGE_TIMEFRAMES:
+        trade_day = datetime.strptime(date, "%Y-%m-%d").date()
+        start = trade_day - timedelta(days=days_back - 1)
+        end = min(trade_day + timedelta(days=10), datetime.utcnow().date())
+        params = {
+            "timeframe": tf,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "limit": 1000,
+            "feed": "sip",
+            "adjustment": "raw",
+        }
+    else:
+        # days_back widens the window backward (calendar days, weekends just come
+        # back empty) so zooming out on the chart can load real prior sessions
+        # instead of running off the edge of a single day's data.
+        trade_day = datetime.strptime(date, "%Y-%m-%d").date()
+        start_day = trade_day - timedelta(days=days_back - 1)
+        params = {
+            "timeframe": tf,
+            "start": f"{start_day.isoformat()}T09:30:00-04:00",
+            "end": f"{date}T16:00:00-04:00",
+            "limit": 1000,
+            "feed": "sip",
+            "adjustment": "raw",
+        }
     headers = {
         "APCA-API-KEY-ID": ALPACA_KEY,
         "APCA-API-SECRET-KEY": ALPACA_SECRET,
     }
 
     try:
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            resp = await client.get(url, params=params, headers=headers)
-            resp.raise_for_status()
-            data = resp.json()
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            raw_bars = await _fetch_alpaca_bars(client, url, params, headers)
 
         bars = []
-        for bar in data.get("bars", []):
+        for bar in raw_bars:
             bars.append({
                 "t": bar.get("t", ""),
                 "o": bar.get("o", 0),
