@@ -2,7 +2,7 @@
 
 ## Watch the walkthrough
 
-[![Watch: I built my own AI trading journal and stopped paying monthly](https://img.youtube.com/vi/LTR4HOfS_hc/maxresdefault.jpg)](https://www.youtube.com/watch?v=LTR4HOfS_hc)
+[![Watch: I built my own AI trading journal and stopped paying monthly](docs/video-thumbnail.png)](https://www.youtube.com/watch?v=LTR4HOfS_hc)
 
 A full tour of the app, an install from an empty folder, and three prompts that change it while
 the camera is running. Every prompt used in the video is in the video description, ready to paste.
