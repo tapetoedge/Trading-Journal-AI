@@ -199,7 +199,7 @@ export default function Brain({ accountId }) {
       ) : (
         <button
           onClick={() => setOpen(true)}
-          title="Open Brain — AI Trading Coach"
+          title="Open Brain, AI Trading Coach"
           style={{
             width: 56, height: 56, borderRadius: '50%',
             background: 'linear-gradient(135deg, var(--green), var(--accent))',

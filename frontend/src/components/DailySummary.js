@@ -653,7 +653,7 @@ export default function DailySummary({ accountId, date, onDateChange, onOpenDeta
         }}>
           <AlertTriangle size={16} color="#f59e0b" style={{ flexShrink: 0 }} />
           <span style={{ fontSize: 13, color: '#f59e0b', fontWeight: 600, flex: 1 }}>
-            {consecutiveLosses} losses in a row — consider stepping back and reviewing before the next trade.
+            {consecutiveLosses} losses in a row. Consider stepping back and reviewing before the next trade.
           </span>
           <button
             onClick={() => setCbDismissed(true)}
@@ -783,7 +783,7 @@ export default function DailySummary({ accountId, date, onDateChange, onOpenDeta
                 );
               })() : (
                 <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  No diary for this day — upload on the Import page.
+                  No diary for this day. Upload on the Import page.
                 </div>
               )}
             </div>

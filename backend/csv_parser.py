@@ -197,8 +197,10 @@ def split_csv_sections(content: str) -> dict[str, list[list[str]]]:
     while i < len(lines):
         line = lines[i].strip()
 
-        # Blank line = potential section boundary
-        if not line:
+        # Blank line = potential section boundary. Excel-saved exports pad an
+        # empty row with commas out to the column count, so a line that is
+        # nothing but commas counts as blank too.
+        if not line or not line.replace(',', '').strip():
             if current_name and current_rows:
                 sections[current_name] = current_rows
             current_name = None
@@ -219,8 +221,10 @@ def split_csv_sections(content: str) -> dict[str, list[list[str]]]:
             # OR the section header IS the first line and the column headers follow
             # We identify sections by looking for lines that are NOT comma-separated data
 
-            # Check if this looks like a section title (few commas, no @ signs, not a data row)
-            comma_count = line.count(',')
+            # Check if this looks like a section title (few commas, no @ signs, not a data row).
+            # Ignore trailing empty fields (Excel padding) so a title like
+            # "Cash Balance,,,,,,,," still counts as zero real commas.
+            comma_count = line.rstrip(',').count(',')
             if comma_count <= 2 and not line.startswith('"5/') and not line.startswith('5/'):
                 # Likely a section title
                 current_name = line.strip('"').strip()

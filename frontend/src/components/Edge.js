@@ -156,7 +156,7 @@ export function HoldTime({ data }) {
         <div style={{ flex: '1 1 160px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
           {bars[1].value > bars[0].value
             ? `You hold losers ${(bars[1].value / bars[0].value).toFixed(1)}x longer than winners. Consider cutting losses faster.`
-            : `You hold winners ${(bars[0].value / bars[1].value).toFixed(1)}x longer than losers. Good discipline — letting winners run.`}
+            : `You hold winners ${(bars[0].value / bars[1].value).toFixed(1)}x longer than losers. Good discipline, letting winners run.`}
         </div>
       )}
     </div>
@@ -211,7 +211,7 @@ export default function Edge({ accountId }) {
             <Section title="R-Multiple Distribution">
               <RMultipleDist data={data?.r_multiple_dist} />
             </Section>
-            <Section title="Hold Time — Winners vs. Losers">
+            <Section title="Hold Time, Winners vs. Losers">
               <HoldTime data={data?.hold_time} />
             </Section>
           </div>

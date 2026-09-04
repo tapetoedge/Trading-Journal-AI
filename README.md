@@ -1,5 +1,12 @@
 # Trading Journal AI
 
+## Watch the walkthrough
+
+[![Watch: I built my own AI trading journal and stopped paying monthly](https://img.youtube.com/vi/LTR4HOfS_hc/maxresdefault.jpg)](https://www.youtube.com/watch?v=LTR4HOfS_hc)
+
+A full tour of the app, an install from an empty folder, and three prompts that change it while
+the camera is running. Every prompt used in the video is in the video description, ready to paste.
+
 An AI-powered trading journal you run locally on your own machine. Import your broker's CSV, and the journal groups executions into round-trip trades, tracks your KPIs (win rate, profit factor, expectancy, drawdown, exit efficiency), and uses Claude to analyze your trading diary, grade your days, and answer questions about your own data.
 
 This whole app was built by describing problems to Claude Code, one session at a time: "my spreadsheet can't group partial fills", "I want my handwritten diary matched to my trades", "show me when in the day I lose money". No web framework expertise required to get here, and none required to make it yours.

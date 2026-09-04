@@ -199,7 +199,7 @@ export default function Import({ accounts, accountId }) {
               ) : /\.(heic|heif)$/i.test(diaryFile.name) ? (
                 // Browsers cannot render HEIC; the server converts it to JPEG on upload.
                 <div style={{ padding: 12, border: '1px solid var(--border)', borderRadius: 8, fontSize: 13, color: 'var(--text-muted)' }}>
-                  {diaryFile.name} — iPhone photo, will be converted on upload
+                  {diaryFile.name} (iPhone photo, will be converted on upload)
                 </div>
               ) : (
                 <img src={URL.createObjectURL(diaryFile)} alt="Diary preview"
@@ -256,7 +256,7 @@ export default function Import({ accounts, accountId }) {
 
           {analyzing && (
             <div style={{ marginTop: 10, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center' }}>
-              Claude is reading your diary — this takes 10–20 seconds...
+              Claude is reading your diary. This takes 10 to 20 seconds...
             </div>
           )}
 
