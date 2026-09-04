@@ -72,6 +72,23 @@ This repo is meant to be adapted, and the fastest way is to point Claude Code at
 
 > Read backend/csv_parser.py. It parses Thinkorswim account statement CSVs: it splits the file into sections, reads execution rows (date, time, buy/sell, quantity, symbol, price, fees), and groups them into round-trip trades by position open/close cycles. Here is a sample CSV export from my broker (pasted below / attached). Write a parser for my broker's format that returns the same execution dict shape (action BOT/SOLD, qty, ticker, price, instrument_type, date, iso_date, time, amount, commission), wire it into parse_thinkorswim_csv or add it as a new function called from backend/main.py's /api/import-csv, and update the Import page label. Keep the duplicate-detection fingerprints working.
 
+## Who made this
+
+Simon, a day trader. I built this because the journals I was paying for made me fill in forms hours
+after the trade, and I never kept it up. I am not a programmer; this was built by describing problems
+to Claude Code, and the prompts are in the video description.
+
+- YouTube: [@tapetoedge](https://www.youtube.com/@tapetoedge), where I show what I build and how
+- X: [@tapetoedge](https://x.com/tapetoedge)
+- Newsletter: [tape-to-edge.beehiiv.com](https://tape-to-edge.beehiiv.com), a free community for
+  traders sharing the tools we make and the strategies we run. One email a week. Nothing for sale.
+
+I take no affiliate money from any broker or tool, and this app has no paid tier, no account and no
+telemetry. If it is useful, fork it.
+
+Educational content, not financial advice. I have no affiliate relationship with anything I show or
+use, ever.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
